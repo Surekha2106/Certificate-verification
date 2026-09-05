@@ -643,218 +643,378 @@ window.viewCertificate = function (id) {
 };
 
 /* ==========================================================================
-   UNIQUE 3D HOLOGRAPHIC QUANTUM WAVE & CYBER CONSTELLATION ENGINE
+   3D PERSPECTIVE CYBER GRIDSCAN WEBGL SHADER ENGINE (Three.js)
    ========================================================================== */
-(function initUniqueBackground() {
-  const canvas = document.getElementById('bg-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let width, height;
-  let time = 0;
-  let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000, radius: 180 };
-  let floatingParticles = [];
-  const particleCount = 40;
+(function initGridScanShader() {
+  const container = document.getElementById('gridscan-container');
+  if (!container || typeof THREE === 'undefined') return;
 
-  function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+  const vert = `
+varying vec2 vUv;
+void main(){
+  vUv = uv;
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}
+`;
+
+  const frag = `
+#extension GL_OES_standard_derivatives : enable
+precision highp float;
+uniform vec3 iResolution;
+uniform float iTime;
+uniform vec2 uSkew;
+uniform float uTilt;
+uniform float uYaw;
+uniform float uLineThickness;
+uniform vec3 uLinesColor;
+uniform vec3 uScanColor;
+uniform float uGridScale;
+uniform float uLineStyle;
+uniform float uLineJitter;
+uniform float uScanOpacity;
+uniform float uScanDirection;
+uniform float uNoise;
+uniform float uBloomOpacity;
+uniform float uScanGlow;
+uniform float uScanSoftness;
+uniform float uPhaseTaper;
+uniform float uScanDuration;
+uniform float uScanDelay;
+uniform float uLightMode;
+varying vec2 vUv;
+
+uniform float uScanStarts[8];
+uniform float uScanCount;
+
+const int MAX_SCANS = 8;
+
+float smoother01(float a, float b, float x){
+  float t = clamp((x - a) / max(1e-5, (b - a)), 0.0, 1.0);
+  return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+
+    vec3 ro = vec3(0.0);
+    vec3 rd = normalize(vec3(p, 2.0));
+
+    float cR = cos(uTilt), sR = sin(uTilt);
+    rd.xy = mat2(cR, -sR, sR, cR) * rd.xy;
+
+    float cY = cos(uYaw), sY = sin(uYaw);
+    rd.xz = mat2(cY, -sY, sY, cY) * rd.xz;
+
+    vec2 skew = clamp(uSkew, vec2(-0.7), vec2(0.7));
+    rd.xy += skew * rd.z;
+
+    vec3 color = vec3(0.0);
+    float minT = 1e20;
+    float gridScale = max(1e-5, uGridScale);
+    float fadeStrength = 1.8;
+    vec2 gridUV = vec2(0.0);
+
+    float hitIsY = 1.0;
+    for (int i = 0; i < 4; i++)
+    {
+        float isY = float(i < 2);
+        float pos = mix(-0.25, 0.25, float(i)) * isY + mix(-0.6, 0.6, float(i - 2)) * (1.0 - isY);
+        float num = pos - (isY * ro.y + (1.0 - isY) * ro.x);
+        float den = isY * rd.y + (1.0 - isY) * rd.x;
+        float t = num / den;
+        vec3 h = ro + rd * t;
+
+        float depthBoost = smoothstep(0.0, 3.0, h.z);
+        h.xy += skew * 0.15 * depthBoost;
+
+        bool use = t > 0.0 && t < minT;
+        gridUV = use ? mix(h.zy, h.xz, isY) / gridScale : gridUV;
+        minT = use ? t : minT;
+        hitIsY = use ? isY : hitIsY;
+    }
+
+    vec3 hit = ro + rd * minT;
+    float dist = length(hit - ro);
+
+    float jitterAmt = clamp(uLineJitter, 0.0, 1.0);
+    if (jitterAmt > 0.0) {
+      vec2 j = vec2(
+        sin(gridUV.y * 2.7 + iTime * 1.8),
+        cos(gridUV.x * 2.3 - iTime * 1.6)
+      ) * (0.15 * jitterAmt);
+      gridUV += j;
+    }
+    float fx = fract(gridUV.x);
+    float fy = fract(gridUV.y);
+    float ax = min(fx, 1.0 - fx);
+    float ay = min(fy, 1.0 - fy);
+    float wx = fwidth(gridUV.x);
+    float wy = fwidth(gridUV.y);
+    float halfPx = max(0.0, uLineThickness) * 0.5;
+
+    float tx = halfPx * wx;
+    float ty = halfPx * wy;
+
+    float aax = wx;
+    float aay = wy;
+
+    float lineX = 1.0 - smoothstep(tx, tx + aax, ax);
+    float lineY = 1.0 - smoothstep(ty, ty + aay, ay);
+    float primaryMask = max(lineX, lineY);
+
+    vec2 gridUV2 = (hitIsY > 0.5 ? hit.xz : hit.zy) / gridScale;
+    if (jitterAmt > 0.0) {
+      vec2 j2 = vec2(
+        cos(gridUV2.y * 2.1 - iTime * 1.4),
+        sin(gridUV2.x * 2.5 + iTime * 1.7)
+      ) * (0.15 * jitterAmt);
+      gridUV2 += j2;
+    }
+    float fx2 = fract(gridUV2.x);
+    float fy2 = fract(gridUV2.y);
+    float ax2 = min(fx2, 1.0 - fx2);
+    float ay2 = min(fy2, 1.0 - fy2);
+    float wx2 = fwidth(gridUV2.x);
+    float wy2 = fwidth(gridUV2.y);
+    float tx2 = halfPx * wx2;
+    float ty2 = halfPx * wy2;
+    float aax2 = wx2;
+    float aay2 = wy2;
+    float lineX2 = 1.0 - smoothstep(tx2, tx2 + aax2, ax2);
+    float lineY2 = 1.0 - smoothstep(ty2, ty2 + aay2, ay2);
+    float altMask = max(lineX2, lineY2);
+
+    float edgeDistX = min(abs(hit.x - (-0.6)), abs(hit.x - 0.6));
+    float edgeDistY = min(abs(hit.y - (-0.25)), abs(hit.y - 0.25));
+    float edgeDist = mix(edgeDistY, edgeDistX, hitIsY);
+    float edgeGate = 1.0 - smoothstep(gridScale * 0.5, gridScale * 2.0, edgeDist);
+    altMask *= edgeGate;
+
+    float lineMask = max(primaryMask, altMask);
+
+    float fade = exp(-dist * fadeStrength);
+
+    float dur = max(0.05, uScanDuration);
+    float del = max(0.0, uScanDelay);
+    float scanZMax = 2.4;
+    float widthScale = max(0.1, uScanGlow);
+    float sigma = max(0.001, 0.18 * widthScale * uScanSoftness);
+    float sigmaA = sigma * 2.0;
+
+    float combinedPulse = 0.0;
+    float combinedAura = 0.0;
+
+    float cycle = dur + del;
+    float tCycle = mod(iTime, cycle);
+    float scanPhase = clamp((tCycle - del) / dur, 0.0, 1.0);
+    float phase = scanPhase;
+    if (uScanDirection > 1.5) {
+      float t2 = mod(max(0.0, iTime - del), 2.0 * dur);
+      phase = (t2 < dur) ? (t2 / dur) : (1.0 - (t2 - dur) / dur);
+    }
+    float scanZ = phase * scanZMax;
+    float dz = abs(hit.z - scanZ);
+    float lineBand = exp(-0.5 * (dz * dz) / (sigma * sigma));
+    float taper = clamp(uPhaseTaper, 0.0, 0.49);
+    float headW = taper;
+    float tailW = taper;
+    float headFade = smoother01(0.0, headW, phase);
+    float tailFade = 1.0 - smoother01(1.0 - tailW, 1.0, phase);
+    float phaseWindow = headFade * tailFade;
+    float pulseBase = lineBand * phaseWindow;
+    combinedPulse += pulseBase * clamp(uScanOpacity, 0.0, 1.0);
+    float auraBand = exp(-0.5 * (dz * dz) / (sigmaA * sigmaA));
+    combinedAura += (auraBand * 0.35) * phaseWindow * clamp(uScanOpacity, 0.0, 1.0);
+
+    for (int i = 0; i < MAX_SCANS; i++) {
+      if (float(i) >= uScanCount) break;
+      float tActiveI = iTime - uScanStarts[i];
+      float phaseI = clamp(tActiveI / dur, 0.0, 1.0);
+      phaseI = (phaseI < 0.5) ? (phaseI * 2.0) : (1.0 - (phaseI - 0.5) * 2.0);
+      float scanZI = phaseI * scanZMax;
+      float dzI = abs(hit.z - scanZI);
+      float lineBandI = exp(-0.5 * (dzI * dzI) / (sigma * sigma));
+      float headFadeI = smoother01(0.0, headW, phaseI);
+      float tailFadeI = 1.0 - smoother01(1.0 - tailW, 1.0, phaseI);
+      float phaseWindowI = headFadeI * tailFadeI;
+      combinedPulse += lineBandI * phaseWindowI * clamp(uScanOpacity, 0.0, 1.0);
+      float auraBandI = exp(-0.5 * (dzI * dzI) / (sigmaA * sigmaA));
+      combinedAura += (auraBandI * 0.35) * phaseWindowI * clamp(uScanOpacity, 0.0, 1.0);
+    }
+
+    float lineVis = lineMask;
+    vec3 gridCol = uLinesColor * lineVis * fade;
+    vec3 scanCol = uScanColor * combinedPulse * 1.4;
+    vec3 scanAura = uScanColor * combinedAura * 1.2;
+
+    color = gridCol + scanCol + scanAura;
+
+    float n = fract(sin(dot(gl_FragCoord.xy + vec2(iTime * 123.4), vec2(12.9898,78.233))) * 43758.5453123);
+    color += (n - 0.5) * uNoise;
+    color = clamp(color, 0.0, 1.0);
+    float alpha = clamp(max(lineVis * 0.8, combinedPulse), 0.0, 1.0);
+    
+    if (uLightMode > 0.5) {
+      float energy = max(max(color.r, color.g), color.b);
+      float coverage = clamp(max(alpha, smoothstep(0.0, 0.55, energy) * 0.82), 0.0, 0.9);
+      coverage *= smoothstep(0.015, 0.12, energy);
+      vec3 chroma = clamp(color / max(energy, 0.0001), 0.0, 1.0);
+      chroma = pow(chroma, vec3(1.2));
+      fragColor = vec4(mix(vec3(0.96, 0.97, 0.98), chroma, coverage * 0.94), 1.0);
+    } else {
+      fragColor = vec4(color, alpha);
+    }
+}
+
+void main(){
+  vec4 c;
+  mainImage(c, vUv * iResolution.xy);
+  gl_FragColor = c;
+}
+`;
+
+  // Renderer Setup
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.autoClear = false;
+  renderer.setClearColor(0x000000, 0);
+  container.appendChild(renderer.domElement);
+
+  const MAX_SCANS = 8;
+  let scanStarts = [];
+  function pushScan(t) {
+    if (scanStarts.length >= MAX_SCANS) scanStarts.shift();
+    scanStarts.push(t);
+    const buf = new Array(MAX_SCANS).fill(0);
+    for (let i = 0; i < scanStarts.length && i < MAX_SCANS; i++) buf[i] = scanStarts[i];
+    uniforms.uScanStarts.value = buf;
+    uniforms.uScanCount.value = scanStarts.length;
   }
 
-  // Floating Quantum Star Nodes
-  class StarParticle {
-    constructor() {
-      this.reset();
-    }
-    reset() {
-      this.x = Math.random() * width;
-      this.y = Math.random() * height;
-      this.vx = (Math.random() - 0.5) * 0.45;
-      this.vy = (Math.random() - 0.5) * 0.45;
-      this.radius = Math.random() * 2 + 1;
-      this.baseAlpha = Math.random() * 0.5 + 0.25;
-      this.pulseSpeed = Math.random() * 0.03 + 0.01;
-      this.hue = Math.random() > 0.5 ? 215 : 185; // Royal Blue / Cyan
-    }
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.x < 0) this.x = width;
-      if (this.x > width) this.x = 0;
-      if (this.y < 0) this.y = height;
-      if (this.y > height) this.y = 0;
+  const uniforms = {
+    iResolution: { value: new THREE.Vector3(window.innerWidth, window.innerHeight, renderer.getPixelRatio()) },
+    iTime: { value: 0 },
+    uSkew: { value: new THREE.Vector2(0, 0) },
+    uTilt: { value: 0 },
+    uYaw: { value: 0 },
+    uLineThickness: { value: 1.2 },
+    uLinesColor: { value: new THREE.Color('#2563eb') },
+    uScanColor: { value: new THREE.Color('#38bdf8') },
+    uGridScale: { value: 0.085 },
+    uLineStyle: { value: 0 },
+    uLineJitter: { value: 0.05 },
+    uScanOpacity: { value: 0.85 },
+    uNoise: { value: 0.012 },
+    uBloomOpacity: { value: 0.5 },
+    uScanGlow: { value: 0.7 },
+    uScanSoftness: { value: 2.0 },
+    uPhaseTaper: { value: 0.4 },
+    uScanDuration: { value: 2.2 },
+    uScanDelay: { value: 1.0 },
+    uScanDirection: { value: 2 },
+    uScanStarts: { value: new Array(MAX_SCANS).fill(0) },
+    uScanCount: { value: 0 },
+    uLightMode: { value: document.documentElement.getAttribute('data-theme') === 'light' ? 1 : 0 }
+  };
 
-      // Mouse interactive deflection
-      const dx = mouse.x - this.x;
-      const dy = mouse.y - this.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < mouse.radius) {
-        const force = (mouse.radius - dist) / mouse.radius;
-        this.x -= (dx / dist) * force * 2.5;
-        this.y -= (dy / dist) * force * 2.5;
-      }
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: vert,
+    fragmentShader: frag,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+    extensions: {
+      derivatives: true
     }
-    draw() {
-      const alpha = this.baseAlpha + Math.sin(time * this.pulseSpeed * 50) * 0.2;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${this.hue}, 90%, 65%, ${Math.max(0.1, alpha)})`;
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = `hsl(${this.hue}, 90%, 60%)`;
-      ctx.fill();
-    }
+  });
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+  scene.add(quad);
+
+  // Mouse & Motion Physics
+  let lookTarget = new THREE.Vector2(0, 0);
+  let lookCurrent = new THREE.Vector2(0, 0);
+  let lookVel = new THREE.Vector2(0, 0);
+  let tiltTarget = 0, tiltCurrent = 0, tiltVel = 0;
+  let yawTarget = 0, yawCurrent = 0, yawVel = 0;
+  const smoothTime = 0.25;
+
+  function smoothDamp(current, target, velRef, smTime, dt) {
+    const omega = 2 / Math.max(0.0001, smTime);
+    const x = omega * dt;
+    const exp = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+    const change = current - target;
+    const temp = (velRef.v + omega * change) * dt;
+    velRef.v = (velRef.v - omega * temp) * exp;
+    return target + (change + temp) * exp;
   }
 
-  function init() {
-    resize();
-    floatingParticles = [];
-    for (let i = 0; i < particleCount; i++) {
-      floatingParticles.push(new StarParticle());
+  window.addEventListener('mousemove', (e) => {
+    const nx = (e.clientX / window.innerWidth) * 2 - 1;
+    const ny = -((e.clientY / window.innerHeight) * 2 - 1);
+    lookTarget.set(nx, ny);
+    yawTarget = nx * 0.4;
+    tiltTarget = -ny * 0.25;
+  });
+
+  window.addEventListener('click', () => {
+    pushScan(performance.now() / 1000);
+  });
+
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, renderer.getPixelRatio());
+  });
+
+  // Theme change observer
+  const observer = new MutationObserver(() => {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    uniforms.uLightMode.value = isLight ? 1 : 0;
+    if (isLight) {
+      uniforms.uLinesColor.value.set('#3b82f6');
+      uniforms.uScanColor.value.set('#0284c7');
+    } else {
+      uniforms.uLinesColor.value.set('#2563eb');
+      uniforms.uScanColor.value.set('#38bdf8');
     }
-  }
+  });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-  function drawQuantumWaveField() {
-    // 3D Perspective Undulating Cyber Waves across bottom/middle
-    const rows = 12;
-    const cols = 36;
-    const startY = height * 0.42;
-    const rowSpacing = (height * 0.65) / rows;
-    const colSpacing = width / cols;
-
-    for (let r = 0; r < rows; r++) {
-      ctx.beginPath();
-      const rowProgress = r / rows;
-      const baseY = startY + r * rowSpacing;
-
-      let points = [];
-      for (let c = 0; c <= cols; c++) {
-        const x = c * colSpacing;
-        
-        // Multi-frequency undulating sine wave
-        const wave1 = Math.sin(c * 0.22 + time * 0.025 + r * 0.35) * (16 + r * 2.5);
-        const wave2 = Math.cos(c * 0.15 - time * 0.018 + r * 0.25) * (12 + r * 1.8);
-        
-        // Mouse ripple distortion
-        const dx = x - mouse.x;
-        const dy = baseY - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        let mouseElevate = 0;
-        if (dist < mouse.radius * 1.5) {
-          const factor = (mouse.radius * 1.5 - dist) / (mouse.radius * 1.5);
-          mouseElevate = Math.sin(factor * Math.PI) * 35;
-        }
-
-        const y = baseY + wave1 + wave2 - mouseElevate;
-        points.push({ x, y, dist });
-      }
-
-      // Draw flowing wave line with gradient
-      for (let i = 0; i < points.length - 1; i++) {
-        const p1 = points[i];
-        const p2 = points[i + 1];
-
-        const lineGradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-        const alpha = (0.08 + rowProgress * 0.22);
-        
-        // Highlight near mouse
-        const isNearMouse = p1.dist < mouse.radius || p2.dist < mouse.radius;
-        if (isNearMouse) {
-          lineGradient.addColorStop(0, `rgba(6, 182, 212, ${Math.min(0.9, alpha + 0.45)})`);
-          lineGradient.addColorStop(1, `rgba(99, 102, 241, ${Math.min(0.9, alpha + 0.45)})`);
-          ctx.lineWidth = 1.8;
-          ctx.shadowBlur = 12;
-          ctx.shadowColor = '#06b6d4';
-        } else {
-          lineGradient.addColorStop(0, `rgba(37, 99, 235, ${alpha})`);
-          lineGradient.addColorStop(1, `rgba(99, 102, 241, ${alpha * 0.8})`);
-          ctx.lineWidth = 1.1;
-          ctx.shadowBlur = 0;
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = lineGradient;
-        ctx.stroke();
-
-        // Draw node points periodically
-        if (i % 3 === 0 && rowProgress > 0.2) {
-          ctx.beginPath();
-          ctx.arc(p1.x, p1.y, isNearMouse ? 2.5 : 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = isNearMouse ? '#38bdf8' : `rgba(147, 197, 253, ${alpha * 1.4})`;
-          ctx.fill();
-        }
-      }
-    }
-  }
-
-  function drawConstellation() {
-    // Connect floating stars
-    for (let i = 0; i < floatingParticles.length; i++) {
-      floatingParticles[i].update();
-      floatingParticles[i].draw();
-
-      for (let j = i + 1; j < floatingParticles.length; j++) {
-        const dx = floatingParticles[i].x - floatingParticles[j].x;
-        const dy = floatingParticles[i].y - floatingParticles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 130) {
-          const alpha = (1 - dist / 130) * 0.24;
-          ctx.beginPath();
-          ctx.moveTo(floatingParticles[i].x, floatingParticles[i].y);
-          ctx.lineTo(floatingParticles[j].x, floatingParticles[j].y);
-          ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-      }
-
-      // Mouse interactive beam
-      const mdx = floatingParticles[i].x - mouse.x;
-      const mdy = floatingParticles[i].y - mouse.y;
-      const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-      if (mdist < mouse.radius) {
-        const alpha = (1 - mdist / mouse.radius) * 0.55;
-        ctx.beginPath();
-        ctx.moveTo(floatingParticles[i].x, floatingParticles[i].y);
-        ctx.lineTo(mouse.x, mouse.y);
-        ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`;
-        ctx.lineWidth = 1.3;
-        ctx.stroke();
-      }
-    }
-  }
-
+  let lastTime = performance.now();
   function animate() {
-    ctx.clearRect(0, 0, width, height);
-    time += 1;
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - lastTime) / 1000);
+    lastTime = now;
 
-    // Smooth mouse lerp
-    mouse.x += (mouse.targetX - mouse.x) * 0.15;
-    mouse.y += (mouse.targetY - mouse.y) * 0.15;
+    const tVel = { v: tiltVel };
+    tiltCurrent = smoothDamp(tiltCurrent, tiltTarget, tVel, smoothTime, dt);
+    tiltVel = tVel.v;
 
-    // Render 3D Quantum Waves & Ambient Constellations
-    drawQuantumWaveField();
-    drawConstellation();
+    const yVel = { v: yawVel };
+    yawCurrent = smoothDamp(yawCurrent, yawTarget, yVel, smoothTime, dt);
+    yawVel = yVel.v;
 
+    const lxVel = { v: lookVel.x };
+    lookCurrent.x = smoothDamp(lookCurrent.x, lookTarget.x, lxVel, smoothTime, dt);
+    lookVel.x = lxVel.v;
+
+    const lyVel = { v: lookVel.y };
+    lookCurrent.y = smoothDamp(lookCurrent.y, lookTarget.y, lyVel, smoothTime, dt);
+    lookVel.y = lyVel.v;
+
+    uniforms.uSkew.value.set(lookCurrent.x * 0.14, -lookCurrent.y * 0.2);
+    uniforms.uTilt.value = tiltCurrent * 0.25;
+    uniforms.uYaw.value = yawCurrent * 0.28;
+    uniforms.iTime.value = now / 1000;
+
+    renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }
 
-  window.addEventListener('resize', () => {
-    resize();
-    init();
-  });
-
-  window.addEventListener('mousemove', (e) => {
-    mouse.targetX = e.clientX;
-    mouse.targetY = e.clientY;
-  });
-
-  window.addEventListener('mouseleave', () => {
-    mouse.targetX = -1000;
-    mouse.targetY = -1000;
-  });
-
-  init();
   animate();
 })();
