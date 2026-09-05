@@ -19,13 +19,21 @@
 
 <body>
 
+  <!-- GLOBAL AMBIENT BACKGROUND GLOWS & GRID -->
+  <div class="global-bg-mesh">
+    <div class="mesh-orb orb-1"></div>
+    <div class="mesh-orb orb-2"></div>
+    <div class="mesh-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
   <!-- PAGE 0: LANDING / LOGIN PAGE -->
   <section id="login-page" class="page active">
     <div class="landing-hero">
       <div class="hero-content">
-        <div class="badge-new">NEW: Instant Cryptographic Verification</div>
+        <div class="badge-new"><i class="fas fa-bolt text-accent"></i> Instant Cryptographic Verification</div>
         <h1 class="premium-title">CertifyHub</h1>
-        <p class="subtitle">Secure, Tamper-Evident & Instantly Verifiable Digital Credentials</p>
+        <p class="subtitle">Secure, Tamper-Evident & Instantly Verifiable Digital Credentials Platform</p>
         <div class="features-grid-mini">
           <div class="feature-item"><i class="fas fa-shield-alt"></i> Tamper Proof</div>
           <div class="feature-item"><i class="fas fa-check-double"></i> One-Tap Verify</div>
@@ -33,7 +41,7 @@
         </div>
         <div class="cta-group">
           <button class="btn btn-accent" id="start-now">Get Started <i class="fas fa-arrow-right"></i></button>
-          <button class="btn btn-primary" id="public-verify">Verify Now</button>
+          <button class="btn btn-primary" id="public-verify"><i class="fas fa-magnifying-glass"></i> Verify Now</button>
         </div>
       </div>
 
@@ -74,13 +82,13 @@
 
   <!-- PAGE 0B: SIGNUP PAGE -->
   <section id="signup-page" class="page">
-    <div class="landing-hero" style="flex-direction: row-reverse;">
-      <div class="hero-content"
-        style="align-items: flex-end; text-align: right; background: linear-gradient(-90deg, rgba(4, 8, 16, 0.95) 0%, rgba(4, 8, 16, 0.7) 70%, transparent 100%);">
-        <h2 class="premium-title" style="font-size: 3rem;">Join the Network</h2>
-        <p class="subtitle">Empowering institutions and students with secure digital credentials and instant verification.</p>
+    <div class="landing-hero signup-hero">
+      <div class="hero-content signup-hero-content">
+        <div class="badge-new"><i class="fas fa-sparkles text-accent"></i> Enterprise Ready Platform</div>
+        <h2 class="premium-title" style="font-size: 3rem;">Join CertifyHub</h2>
+        <p class="subtitle">Empowering institutions and students with secure digital credentials, cryptographic signatures, and instant authenticity verification.</p>
         <div class="features-grid-mini">
-          <div class="feature-item"><i class="fas fa-university"></i> Institute Verification</div>
+          <div class="feature-item"><i class="fas fa-university"></i> Institutional Authority</div>
           <div class="feature-item"><i class="fas fa-user-graduate"></i> Student Portfolio</div>
         </div>
       </div>
@@ -124,26 +132,90 @@
     </div>
   </section>
 
-
   <!-- DASHBOARD WRAPPER (Visible after login) -->
   <div id="dashboard-wrapper" class="main-wrapper" style="display: none;">
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="logo mb-40">
-        <span class="text-accent"><i class="fas fa-certificate"></i> CertifyHub</span>
+      <div class="sidebar-brand-header">
+        <div class="logo">
+          <span class="text-accent"><i class="fas fa-certificate"></i> CertifyHub</span>
+        </div>
+        <span class="brand-tag">v2.4 LIVE</span>
       </div>
+
       <nav class="sidebar-nav">
+        <!-- GROUP 1: OVERVIEW -->
+        <div class="nav-category-header">OVERVIEW</div>
         <ul>
-          <li class="active" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</li>
-          <li data-page="my-certificates"><i class="fas fa-certificate"></i> My Certificates</li>
-          <li data-page="issue-certificate"><i class="fas fa-plus-circle"></i> Issue Certificate</li>
-          <li data-page="verify-certificate"><i class="fas fa-shield-check"></i> Verify Certificate</li>
-          <li data-page="recent-verifications"><i class="fas fa-history"></i> History</li>
-          <li data-page="profile"><i class="fas fa-user-gear"></i> Profile Settings</li>
+          <li class="active" data-page="dashboard">
+            <i class="fas fa-chart-pie"></i>
+            <span>Dashboard</span>
+            <span class="nav-badge">Live</span>
+          </li>
+        </ul>
+
+        <!-- GROUP 2: CREDENTIAL MANAGEMENT -->
+        <div class="nav-category-header">CREDENTIAL MANAGEMENT</div>
+        <ul>
+          <li data-page="my-certificates">
+            <i class="fas fa-award"></i>
+            <span>My Certificates</span>
+            <span class="nav-pill" id="nav-cert-count">0</span>
+          </li>
+          <li data-page="issue-certificate">
+            <i class="fas fa-plus-circle"></i>
+            <span>Issue Certificate</span>
+            <span class="nav-pill accent">New</span>
+          </li>
+          <li data-page="verify-certificate">
+            <i class="fas fa-shield-alt"></i>
+            <span>Verify Certificate</span>
+            <span class="nav-pill success">Instant</span>
+          </li>
+          <li data-page="recent-verifications">
+            <i class="fas fa-clock-rotate-left"></i>
+            <span>History & Logs</span>
+          </li>
+        </ul>
+
+        <!-- GROUP 3: SYSTEM & PREFERENCES -->
+        <div class="nav-category-header">SETTINGS & AUDIT</div>
+        <ul>
+          <li data-page="profile">
+            <i class="fas fa-user-shield"></i>
+            <span>Profile & Security</span>
+          </li>
         </ul>
       </nav>
-      <div class="sidebar-footer mt-auto">
-        <button id="logout-btn" class="btn btn-primary w-100"><i class="fas fa-sign-out-alt"></i> Logout</button>
+
+      <!-- SIDEBAR LIVE SECURITY WIDGET -->
+      <div class="sidebar-status-box mt-20">
+        <div class="status-top">
+          <div class="status-indicator-dot live"></div>
+          <span class="status-label">SHA-256 Engine</span>
+          <span class="status-badge-ok">ACTIVE</span>
+        </div>
+        <div class="status-meta">
+          <span>Integrity Guard</span>
+          <span class="status-score">100% Safe</span>
+        </div>
+        <div class="status-progress">
+          <div class="status-progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR USER PROFILE FOOTER -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user-info" id="sidebar-user-trigger" onclick="switchPage('profile')">
+          <img src="https://api.dicebear.com/7.x/initials/svg?seed=Surekha&backgroundColor=2563eb&textColor=ffffff" id="sidebar-avatar" class="sidebar-avatar" alt="User Avatar">
+          <div class="sidebar-user-meta">
+            <span class="sidebar-user-name" id="sidebar-user-name">Surekha</span>
+            <span class="sidebar-user-role" id="sidebar-user-role">Administrator</span>
+          </div>
+        </div>
+        <button id="logout-btn" class="sidebar-logout-icon-btn" title="Sign Out">
+          <i class="fas fa-arrow-right-from-bracket"></i>
+        </button>
       </div>
     </aside>
 

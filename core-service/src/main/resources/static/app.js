@@ -76,6 +76,9 @@ function handleUserLogin(user, userToken, isNewSignup = false) {
   const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUser.fullName || 'User')}&backgroundColor=2563eb&textColor=ffffff`;
   if (document.getElementById('nav-user-name')) document.getElementById('nav-user-name').innerText = currentUser.fullName;
   if (document.getElementById('nav-user-avatar')) document.getElementById('nav-user-avatar').src = avatarUrl;
+  if (document.getElementById('sidebar-user-name')) document.getElementById('sidebar-user-name').innerText = currentUser.fullName;
+  if (document.getElementById('sidebar-user-role')) document.getElementById('sidebar-user-role').innerText = currentUser.role.charAt(0) + currentUser.role.slice(1).toLowerCase();
+  if (document.getElementById('sidebar-avatar')) document.getElementById('sidebar-avatar').src = avatarUrl;
   if (document.getElementById('profile-full-name')) document.getElementById('profile-full-name').value = currentUser.fullName;
   if (document.getElementById('profile-email')) document.getElementById('profile-email').value = currentUser.email;
   if (document.getElementById('profile-display-name')) document.getElementById('profile-display-name').innerText = currentUser.fullName;
@@ -91,12 +94,6 @@ function handleUserLogin(user, userToken, isNewSignup = false) {
   const signupPage = document.getElementById('signup-page');
   if (signupPage) signupPage.classList.remove('active');
   if (dashboardWrapper) dashboardWrapper.style.display = 'flex';
-
-  // RBAC: Students cannot issue certificates
-  const issueNavBtn = document.querySelector('[data-page="issue-certificate"]');
-  if (issueNavBtn) {
-    issueNavBtn.style.display = (currentUser.role === 'STUDENT') ? 'none' : 'flex';
-  }
 
   switchPage('dashboard');
   if (isNewSignup) {
@@ -295,6 +292,8 @@ async function renderDashboard() {
 
     const profCertCount = document.getElementById('profile-cert-count');
     if (profCertCount) profCertCount.innerText = allCertificatesCache.length;
+    const navCertCount = document.getElementById('nav-cert-count');
+    if (navCertCount) navCertCount.innerText = allCertificatesCache.length;
 
     if (activityList) {
       activityList.innerHTML = allCertificatesCache.slice(-5).reverse().map(c => `
