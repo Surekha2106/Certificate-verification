@@ -645,9 +645,12 @@ window.viewCertificate = function (id) {
 /* ==========================================================================
    3D PERSPECTIVE CYBER GRIDSCAN WEBGL SHADER ENGINE (Three.js)
    ========================================================================== */
-(function initGridScanShader() {
+function initGridScanShader() {
   const container = document.getElementById('gridscan-container');
-  if (!container || typeof THREE === 'undefined') return;
+  if (!container || typeof THREE === 'undefined') {
+    setTimeout(initGridScanShader, 40);
+    return;
+  }
 
   const vert = `
 varying vec2 vUv;
@@ -658,8 +661,6 @@ void main(){
 `;
 
   const frag = `
-#extension GL_OES_standard_derivatives : enable
-precision highp float;
 uniform vec3 iResolution;
 uniform float iTime;
 uniform vec2 uSkew;
@@ -1017,4 +1018,11 @@ void main(){
   }
 
   animate();
-})();
+}
+
+// Start GridScan Shader
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initGridScanShader);
+} else {
+  initGridScanShader();
+}
