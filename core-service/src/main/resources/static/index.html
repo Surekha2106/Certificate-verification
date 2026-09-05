@@ -139,86 +139,23 @@
   <div id="dashboard-wrapper" class="main-wrapper" style="display: none;">
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="sidebar-brand-header">
-        <div class="logo">
-          <span class="text-accent"><i class="fas fa-certificate"></i> CertifyHub</span>
-        </div>
-        <span class="brand-tag">v2.4 LIVE</span>
+      <div class="logo mb-30">
+        <span class="text-accent"><i class="fas fa-certificate"></i> CertifyHub</span>
       </div>
 
       <nav class="sidebar-nav">
-        <!-- GROUP 1: OVERVIEW -->
-        <div class="nav-category-header">OVERVIEW</div>
         <ul>
-          <li class="active" data-page="dashboard">
-            <i class="fas fa-chart-pie"></i>
-            <span>Dashboard</span>
-            <span class="nav-badge">Live</span>
-          </li>
-        </ul>
-
-        <!-- GROUP 2: CREDENTIAL MANAGEMENT -->
-        <div class="nav-category-header">CREDENTIAL MANAGEMENT</div>
-        <ul>
-          <li data-page="my-certificates">
-            <i class="fas fa-award"></i>
-            <span>My Certificates</span>
-            <span class="nav-pill" id="nav-cert-count">0</span>
-          </li>
-          <li data-page="issue-certificate">
-            <i class="fas fa-plus-circle"></i>
-            <span>Issue Certificate</span>
-            <span class="nav-pill accent">New</span>
-          </li>
-          <li data-page="verify-certificate">
-            <i class="fas fa-shield-alt"></i>
-            <span>Verify Certificate</span>
-            <span class="nav-pill success">Instant</span>
-          </li>
-          <li data-page="recent-verifications">
-            <i class="fas fa-clock-rotate-left"></i>
-            <span>History & Logs</span>
-          </li>
-        </ul>
-
-        <!-- GROUP 3: SYSTEM & PREFERENCES -->
-        <div class="nav-category-header">SETTINGS & AUDIT</div>
-        <ul>
-          <li data-page="profile">
-            <i class="fas fa-user-shield"></i>
-            <span>Profile & Security</span>
-          </li>
+          <li class="active" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</li>
+          <li data-page="my-certificates"><i class="fas fa-certificate"></i> My Certificates</li>
+          <li data-page="issue-certificate"><i class="fas fa-plus-circle"></i> Issue Certificate</li>
+          <li data-page="verify-certificate"><i class="fas fa-shield-alt"></i> Verify Certificate</li>
+          <li data-page="recent-verifications"><i class="fas fa-history"></i> History</li>
+          <li data-page="profile"><i class="fas fa-user-gear"></i> Profile Settings</li>
         </ul>
       </nav>
 
-      <!-- SIDEBAR LIVE SECURITY WIDGET -->
-      <div class="sidebar-status-box mt-20">
-        <div class="status-top">
-          <div class="status-indicator-dot live"></div>
-          <span class="status-label">SHA-256 Engine</span>
-          <span class="status-badge-ok">ACTIVE</span>
-        </div>
-        <div class="status-meta">
-          <span>Integrity Guard</span>
-          <span class="status-score">100% Safe</span>
-        </div>
-        <div class="status-progress">
-          <div class="status-progress-bar"></div>
-        </div>
-      </div>
-
-      <!-- SIDEBAR USER PROFILE FOOTER -->
-      <div class="sidebar-footer">
-        <div class="sidebar-user-info" id="sidebar-user-trigger" onclick="switchPage('profile')">
-          <img src="https://api.dicebear.com/7.x/initials/svg?seed=Surekha&backgroundColor=2563eb&textColor=ffffff" id="sidebar-avatar" class="sidebar-avatar" alt="User Avatar">
-          <div class="sidebar-user-meta">
-            <span class="sidebar-user-name" id="sidebar-user-name">Surekha</span>
-            <span class="sidebar-user-role" id="sidebar-user-role">Administrator</span>
-          </div>
-        </div>
-        <button id="logout-btn" class="sidebar-logout-icon-btn" title="Sign Out">
-          <i class="fas fa-arrow-right-from-bracket"></i>
-        </button>
+      <div class="sidebar-footer mt-auto">
+        <button id="logout-btn" class="btn btn-primary w-100"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </aside>
 
