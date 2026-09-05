@@ -643,126 +643,216 @@ window.viewCertificate = function (id) {
 };
 
 /* ==========================================================================
-   INTERACTIVE BACKGROUND PARTICLE CONSTELLATION SYSTEM
+   UNIQUE 3D HOLOGRAPHIC QUANTUM WAVE & CYBER CONSTELLATION ENGINE
    ========================================================================== */
-(function initBackgroundParticles() {
+(function initUniqueBackground() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let width, height;
-  let particles = [];
-  const particleCount = 55;
-  const maxDistance = 130;
-  let mouse = { x: null, y: null, radius: 150 };
+  let time = 0;
+  let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000, radius: 180 };
+  let floatingParticles = [];
+  const particleCount = 40;
 
   function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   }
 
-  class Particle {
+  // Floating Quantum Star Nodes
+  class StarParticle {
     constructor() {
+      this.reset();
+    }
+    reset() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      this.vx = (Math.random() - 0.5) * 0.6;
-      this.vy = (Math.random() - 0.5) * 0.6;
+      this.vx = (Math.random() - 0.5) * 0.45;
+      this.vy = (Math.random() - 0.5) * 0.45;
       this.radius = Math.random() * 2 + 1;
-      this.baseAlpha = Math.random() * 0.4 + 0.3;
+      this.baseAlpha = Math.random() * 0.5 + 0.25;
+      this.pulseSpeed = Math.random() * 0.03 + 0.01;
+      this.hue = Math.random() > 0.5 ? 215 : 185; // Royal Blue / Cyan
     }
-
     update() {
       this.x += this.vx;
       this.y += this.vy;
+      if (this.x < 0) this.x = width;
+      if (this.x > width) this.x = 0;
+      if (this.y < 0) this.y = height;
+      if (this.y > height) this.y = 0;
 
-      if (this.x < 0 || this.x > width) this.vx = -this.vx;
-      if (this.y < 0 || this.y > height) this.vy = -this.vy;
-
-      // Subtle mouse reaction
-      if (mouse.x !== null && mouse.y !== null) {
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < mouse.radius) {
-          const force = (mouse.radius - dist) / mouse.radius;
-          this.x -= (dx / dist) * force * 1.5;
-          this.y -= (dy / dist) * force * 1.5;
-        }
+      // Mouse interactive deflection
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < mouse.radius) {
+        const force = (mouse.radius - dist) / mouse.radius;
+        this.x -= (dx / dist) * force * 2.5;
+        this.y -= (dy / dist) * force * 2.5;
       }
     }
-
     draw() {
+      const alpha = this.baseAlpha + Math.sin(time * this.pulseSpeed * 50) * 0.2;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(59, 130, 246, ${this.baseAlpha})`;
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = '#3b82f6';
+      ctx.fillStyle = `hsla(${this.hue}, 90%, 65%, ${Math.max(0.1, alpha)})`;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = `hsl(${this.hue}, 90%, 60%)`;
       ctx.fill();
     }
   }
 
   function init() {
     resize();
-    particles = [];
+    floatingParticles = [];
     for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
+      floatingParticles.push(new StarParticle());
     }
   }
 
-  function animate() {
-    ctx.clearRect(0, 0, width, height);
+  function drawQuantumWaveField() {
+    // 3D Perspective Undulating Cyber Waves across bottom/middle
+    const rows = 12;
+    const cols = 36;
+    const startY = height * 0.42;
+    const rowSpacing = (height * 0.65) / rows;
+    const colSpacing = width / cols;
 
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].update();
-      particles[i].draw();
+    for (let r = 0; r < rows; r++) {
+      ctx.beginPath();
+      const rowProgress = r / rows;
+      const baseY = startY + r * rowSpacing;
 
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
+      let points = [];
+      for (let c = 0; c <= cols; c++) {
+        const x = c * colSpacing;
+        
+        // Multi-frequency undulating sine wave
+        const wave1 = Math.sin(c * 0.22 + time * 0.025 + r * 0.35) * (16 + r * 2.5);
+        const wave2 = Math.cos(c * 0.15 - time * 0.018 + r * 0.25) * (12 + r * 1.8);
+        
+        // Mouse ripple distortion
+        const dx = x - mouse.x;
+        const dy = baseY - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        let mouseElevate = 0;
+        if (dist < mouse.radius * 1.5) {
+          const factor = (mouse.radius * 1.5 - dist) / (mouse.radius * 1.5);
+          mouseElevate = Math.sin(factor * Math.PI) * 35;
+        }
+
+        const y = baseY + wave1 + wave2 - mouseElevate;
+        points.push({ x, y, dist });
+      }
+
+      // Draw flowing wave line with gradient
+      for (let i = 0; i < points.length - 1; i++) {
+        const p1 = points[i];
+        const p2 = points[i + 1];
+
+        const lineGradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+        const alpha = (0.08 + rowProgress * 0.22);
+        
+        // Highlight near mouse
+        const isNearMouse = p1.dist < mouse.radius || p2.dist < mouse.radius;
+        if (isNearMouse) {
+          lineGradient.addColorStop(0, `rgba(6, 182, 212, ${Math.min(0.9, alpha + 0.45)})`);
+          lineGradient.addColorStop(1, `rgba(99, 102, 241, ${Math.min(0.9, alpha + 0.45)})`);
+          ctx.lineWidth = 1.8;
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#06b6d4';
+        } else {
+          lineGradient.addColorStop(0, `rgba(37, 99, 235, ${alpha})`);
+          lineGradient.addColorStop(1, `rgba(99, 102, 241, ${alpha * 0.8})`);
+          ctx.lineWidth = 1.1;
+          ctx.shadowBlur = 0;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = lineGradient;
+        ctx.stroke();
+
+        // Draw node points periodically
+        if (i % 3 === 0 && rowProgress > 0.2) {
+          ctx.beginPath();
+          ctx.arc(p1.x, p1.y, isNearMouse ? 2.5 : 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = isNearMouse ? '#38bdf8' : `rgba(147, 197, 253, ${alpha * 1.4})`;
+          ctx.fill();
+        }
+      }
+    }
+  }
+
+  function drawConstellation() {
+    // Connect floating stars
+    for (let i = 0; i < floatingParticles.length; i++) {
+      floatingParticles[i].update();
+      floatingParticles[i].draw();
+
+      for (let j = i + 1; j < floatingParticles.length; j++) {
+        const dx = floatingParticles[i].x - floatingParticles[j].x;
+        const dy = floatingParticles[i].y - floatingParticles[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < maxDistance) {
-          const alpha = (1 - dist / maxDistance) * 0.28;
+        if (dist < 130) {
+          const alpha = (1 - dist / 130) * 0.24;
           ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(96, 165, 250, ${alpha})`;
+          ctx.moveTo(floatingParticles[i].x, floatingParticles[i].y);
+          ctx.lineTo(floatingParticles[j].x, floatingParticles[j].y);
+          ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
           ctx.lineWidth = 1;
           ctx.stroke();
         }
       }
 
-      // Connect to mouse
-      if (mouse.x !== null && mouse.y !== null) {
-        const dx = particles[i].x - mouse.x;
-        const dy = particles[i].y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < mouse.radius) {
-          const alpha = (1 - dist / mouse.radius) * 0.4;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(mouse.x, mouse.y);
-          ctx.strokeStyle = `rgba(14, 165, 233, ${alpha})`;
-          ctx.lineWidth = 1.2;
-          ctx.stroke();
-        }
+      // Mouse interactive beam
+      const mdx = floatingParticles[i].x - mouse.x;
+      const mdy = floatingParticles[i].y - mouse.y;
+      const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+      if (mdist < mouse.radius) {
+        const alpha = (1 - mdist / mouse.radius) * 0.55;
+        ctx.beginPath();
+        ctx.moveTo(floatingParticles[i].x, floatingParticles[i].y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`;
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
       }
     }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    time += 1;
+
+    // Smooth mouse lerp
+    mouse.x += (mouse.targetX - mouse.x) * 0.15;
+    mouse.y += (mouse.targetY - mouse.y) * 0.15;
+
+    // Render 3D Quantum Waves & Ambient Constellations
+    drawQuantumWaveField();
+    drawConstellation();
 
     requestAnimationFrame(animate);
   }
 
   window.addEventListener('resize', () => {
     resize();
+    init();
   });
 
   window.addEventListener('mousemove', (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
+    mouse.targetX = e.clientX;
+    mouse.targetY = e.clientY;
   });
 
   window.addEventListener('mouseleave', () => {
-    mouse.x = null;
-    mouse.y = null;
+    mouse.targetX = -1000;
+    mouse.targetY = -1000;
   });
 
   init();
