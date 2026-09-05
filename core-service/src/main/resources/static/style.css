@@ -789,8 +789,16 @@ a:hover {
 }
 
 /* ==========================================================================
-   SIDEBAR NAVIGATION (Clean, Minimalist, Modern)
+   SIDEBAR & DASHBOARD LAYOUT (Clean, Minimalist, Modern)
    ========================================================================== */
+
+.main-wrapper {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
 
 .sidebar {
   width: 250px;
