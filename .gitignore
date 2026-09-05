@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+
+# Maven / Java build artifacts
+target/
+**/target/
+*.class
+**/*.class
+*.jar
+**/*.jar
+*.war
+**/*.war
+
+# Hardhat build artifacts
+artifacts/
+**/artifacts/
+cache/
+**/cache/
+
+# Uploads, logs and temporary files
+uploads/
+**/uploads/
+*.log
+**/*.log
+*startup_log*.txt
+*compile_out*.txt
+
+# IDE / OS files
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
