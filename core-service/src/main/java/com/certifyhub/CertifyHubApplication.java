@@ -1,4 +1,4 @@
-package com.blockcred;
+package com.certifyhub;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,12 +7,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-public class BlockCredApplication {
+public class CertifyHubApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BlockCredApplication.class, args);
+        SpringApplication.run(CertifyHubApplication.class, args);
         System.out.println("\n" + "=".repeat(60));
-        System.out.println("🚀 BlockCred Full-Stack Java System is LIVE!");
+        System.out.println("🚀 CertifyHub Digital Credential Platform is LIVE!");
         System.out.println("👉 Open the Portal: http://localhost:8080");
         System.out.println("👉 H2 Database:     http://localhost:8080/h2-console");
         System.out.println("=".repeat(60) + "\n");
@@ -28,7 +28,3 @@ public class BlockCredApplication {
         };
     }
 }
-// Run: ./mvnw spring-boot:run
-// URL: http://localhost:8080
-// H2 Console: http://localhost:8080/h2-console
-// JDBC URL: jdbc:h2:mem:blockcreddb

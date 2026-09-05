@@ -1,4 +1,4 @@
-package com.blockcred.service;
+package com.certifyhub.service;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;

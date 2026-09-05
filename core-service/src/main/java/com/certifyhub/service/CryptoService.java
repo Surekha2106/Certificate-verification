@@ -1,4 +1,4 @@
-package com.blockcred.service;
+package com.certifyhub.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

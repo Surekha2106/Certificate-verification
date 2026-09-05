@@ -1,7 +1,7 @@
-package com.blockcred.controller;
+package com.certifyhub.controller;
 
-import com.blockcred.model.User;
-import com.blockcred.repository.UserRepository;
+import com.certifyhub.model.User;
+import com.certifyhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ public class AuthController {
 
     @GetMapping("/ping")
     public ResponseEntity<?> ping() {
-        return ResponseEntity.ok(Map.of("status", "UP", "service", "blockcred-core"));
+        return ResponseEntity.ok(Map.of("status", "UP", "service", "certifyhub-core"));
     }
 
     @PostMapping("/register")
@@ -82,4 +82,3 @@ public class AuthController {
         ));
     }
 }
-

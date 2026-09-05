@@ -1,7 +1,7 @@
 <div align="center">
   
-  # 🎓 BlockCred  
-  **Cryptographic Digital Credential & Certificate Verification System**
+  # 🎓 CertifyHub  
+  **Digital Credential & Certificate Verification Platform**
 
   <p align="center">
     <img src="https://img.shields.io/badge/Backend-Java_Spring_Boot-6db33f?style=for-the-badge&logo=spring&logoColor=white" alt="Spring Boot" />
@@ -17,7 +17,7 @@
 
 ## 📖 Overview
 
-**BlockCred** is a standalone **Full-Stack Java (Spring Boot)** web application designed to eradicate credential fraud and certificate forgery. By generating cryptographic `SHA-256` digital fingerprints for issued documents and anchoring them in a high-performance database, it allows instant, tamper-evident verification via ID lookup, file re-hashing, or QR code scanning.
+**CertifyHub** is an enterprise-grade **Full-Stack Java (Spring Boot)** web application designed to eradicate credential fraud and certificate forgery. By generating cryptographic `SHA-256` digital fingerprints for issued documents and storing them securely in a high-performance database registry, it enables instant, tamper-evident verification via ID lookup, file re-hashing, or QR code scanning.
 
 ---
 
@@ -72,7 +72,7 @@ cd core-service
 
 **H2 Database Web Console:**
 - URL: **[http://localhost:8080/h2-console](http://localhost:8080/h2-console)**
-- JDBC URL: `jdbc:h2:mem:blockcreddb`
+- JDBC URL: `jdbc:h2:mem:certifyhubdb`
 - Username: `sa`
 - Password: `password`
 
@@ -80,12 +80,12 @@ cd core-service
 
 ## 🗄️ Database Configuration
 
-You can toggle between databases in [`core-service/src/main/resources/application.properties`](file:///d:/Final_Of_Surekha/Projects/blockchain/core-service/src/main/resources/application.properties):
+You can toggle between databases in [`core-service/src/main/resources/application.properties`](file:///d:/Final_Of_Surekha/Projects/new-certification/core-service/src/main/resources/application.properties):
 
 * **H2 (Default, In-Memory)**: Works out of the box with zero external database software required.
 * **MySQL (Persistent)**: Uncomment the MySQL lines in `application.properties`:
   ```properties
-  spring.datasource.url=jdbc:mysql://localhost:3306/blockcreddb?createDatabaseIfNotExist=true&useSSL=false
+  spring.datasource.url=jdbc:mysql://localhost:3306/certifyhubdb?createDatabaseIfNotExist=true&useSSL=false
   spring.datasource.username=root
   spring.datasource.password=root
   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver

@@ -1,4 +1,4 @@
-package com.blockcred.model;
+package com.certifyhub.model;
 
 import jakarta.persistence.*;
 

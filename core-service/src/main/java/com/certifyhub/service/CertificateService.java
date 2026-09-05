@@ -1,7 +1,7 @@
-package com.blockcred.service;
+package com.certifyhub.service;
 
-import com.blockcred.model.Certificate;
-import com.blockcred.repository.CertificateRepository;
+import com.certifyhub.model.Certificate;
+import com.certifyhub.repository.CertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

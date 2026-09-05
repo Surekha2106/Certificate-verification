@@ -1,6 +1,6 @@
-package com.blockcred.repository;
+package com.certifyhub.repository;
 
-import com.blockcred.model.User;
+import com.certifyhub.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

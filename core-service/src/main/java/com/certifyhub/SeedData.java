@@ -1,7 +1,7 @@
-package com.blockcred;
+package com.certifyhub;
 
-import com.blockcred.model.User;
-import com.blockcred.repository.UserRepository;
+import com.certifyhub.model.User;
+import com.certifyhub.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

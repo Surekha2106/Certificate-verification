@@ -1,6 +1,6 @@
 @echo off
 echo ===================================================
-echo   BlockCred - Full Java Web Application Launcher
+echo   CertifyHub - Full Java Web Application Launcher
 echo ===================================================
 
 echo [1/2] Stopping any existing processes on port 8080...

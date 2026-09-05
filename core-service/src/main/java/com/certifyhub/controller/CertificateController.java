@@ -1,7 +1,7 @@
-package com.blockcred.controller;
+package com.certifyhub.controller;
 
-import com.blockcred.model.Certificate;
-import com.blockcred.service.CertificateService;
+import com.certifyhub.model.Certificate;
+import com.certifyhub.service.CertificateService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -99,60 +99,40 @@ public class CertificateController {
                         "verified", true,
                         "certificate", cert
                 )))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                .orElse(ResponseEntity.ok(Map.of(
                         "verified", false,
-                        "message", "Certificate hash not found in cryptographic registry"
+                        "message", "Certificate hash not found in registry"
                 )));
+    }
+
+    /**
+     * Verify an uploaded certificate file against registered hashes.
+     */
+    @PostMapping("/verify-file")
+    public ResponseEntity<?> verifyFile(@RequestParam("certFile") MultipartFile file) {
+        try {
+            return certificateService.verifyCertificateFile(file)
+                    .map(cert -> ResponseEntity.ok(Map.of(
+                            "verified", true,
+                            "certificate", cert
+                    )))
+                    .orElse(ResponseEntity.ok(Map.of(
+                            "verified", false,
+                            "message", "No matching certificate found. The file may be forged or tampered."
+                    )));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Verification failed: " + e.getMessage()));
+        }
     }
 
     /**
      * Get certificate by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Certificate> getById(@PathVariable String id) {
+    public ResponseEntity<?> getById(@PathVariable String id) {
         return certificateService.getCertificateById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    /**
-     * Verify certificate by ID
-     */
-    @GetMapping("/verify/{id}")
-    public ResponseEntity<?> verifyById(@PathVariable String id) {
-        return certificateService.getCertificateById(id)
-                .map(cert -> ResponseEntity.ok(Map.of(
-                        "verified", true,
-                        "certificate", cert
-                )))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                        "verified", false,
-                        "message", "Invalid or non-existent Certificate ID"
-                )));
-    }
-
-    /**
-     * Verify PDF integrity by uploading the file
-     */
-    @PostMapping("/verify-pdf")
-    public ResponseEntity<?> verifyPdf(@RequestParam("certFile") MultipartFile certFile) {
-        try {
-            if (certFile.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "File is required for verification"));
-            }
-
-            return certificateService.verifyCertificateFile(certFile)
-                    .map(cert -> ResponseEntity.ok(Map.of(
-                            "verified", true,
-                            "certificate", cert
-                    )))
-                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                            "verified", false,
-                            "message", "Certificate hash not found in cryptographic registry. File may have been altered or tampered with."
-                    )));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Verification failed: " + e.getMessage()));
-        }
     }
 }

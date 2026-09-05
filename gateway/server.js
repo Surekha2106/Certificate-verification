@@ -6,9 +6,6 @@ const fs = require('fs');
 const qrcode = require('qrcode');
 const axios = require('axios');
 const cors = require('cors');
-const { ethers } = require('ethers');
-const CryptoJS = require('crypto-js');
-
 const crypto = require('crypto');
 
 const app = express();
@@ -194,5 +191,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`BlockCred Gateway running at http://localhost:${PORT}`);
+    console.log(`CertifyHub Gateway running at http://localhost:${PORT}`);
 });
