@@ -712,7 +712,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec3 color = vec3(0.0);
     float minT = 1e20;
     float gridScale = max(1e-5, uGridScale);
-    float fadeStrength = 1.8;
+    float fadeStrength = 1.2;
     vec2 gridUV = vec2(0.0);
 
     float hitIsY = 1.0;
@@ -825,7 +825,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     float pulseBase = lineBand * phaseWindow;
     combinedPulse += pulseBase * clamp(uScanOpacity, 0.0, 1.0);
     float auraBand = exp(-0.5 * (dz * dz) / (sigmaA * sigmaA));
-    combinedAura += (auraBand * 0.35) * phaseWindow * clamp(uScanOpacity, 0.0, 1.0);
+    combinedAura += (auraBand * 0.45) * phaseWindow * clamp(uScanOpacity, 0.0, 1.0);
 
     for (int i = 0; i < MAX_SCANS; i++) {
       if (float(i) >= uScanCount) break;
@@ -840,20 +840,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
       float phaseWindowI = headFadeI * tailFadeI;
       combinedPulse += lineBandI * phaseWindowI * clamp(uScanOpacity, 0.0, 1.0);
       float auraBandI = exp(-0.5 * (dzI * dzI) / (sigmaA * sigmaA));
-      combinedAura += (auraBandI * 0.35) * phaseWindowI * clamp(uScanOpacity, 0.0, 1.0);
+      combinedAura += (auraBandI * 0.45) * phaseWindowI * clamp(uScanOpacity, 0.0, 1.0);
     }
 
     float lineVis = lineMask;
-    vec3 gridCol = uLinesColor * lineVis * fade;
-    vec3 scanCol = uScanColor * combinedPulse * 1.4;
-    vec3 scanAura = uScanColor * combinedAura * 1.2;
+    vec3 gridCol = uLinesColor * lineVis * fade * 1.5;
+    vec3 scanCol = uScanColor * combinedPulse * 2.0;
+    vec3 scanAura = uScanColor * combinedAura * 1.6;
 
     color = gridCol + scanCol + scanAura;
 
     float n = fract(sin(dot(gl_FragCoord.xy + vec2(iTime * 123.4), vec2(12.9898,78.233))) * 43758.5453123);
     color += (n - 0.5) * uNoise;
     color = clamp(color, 0.0, 1.0);
-    float alpha = clamp(max(lineVis * 0.8, combinedPulse), 0.0, 1.0);
+    float alpha = clamp(max(lineVis * 0.95, combinedPulse * 1.8), 0.0, 1.0);
     
     if (uLightMode > 0.5) {
       float energy = max(max(color.r, color.g), color.b);
@@ -899,20 +899,20 @@ void main(){
     uSkew: { value: new THREE.Vector2(0, 0) },
     uTilt: { value: 0 },
     uYaw: { value: 0 },
-    uLineThickness: { value: 1.2 },
-    uLinesColor: { value: new THREE.Color('#2563eb') },
-    uScanColor: { value: new THREE.Color('#38bdf8') },
-    uGridScale: { value: 0.085 },
+    uLineThickness: { value: 1.4 },
+    uLinesColor: { value: new THREE.Color('#3b82f6') },
+    uScanColor: { value: new THREE.Color('#00f2fe') },
+    uGridScale: { value: 0.09 },
     uLineStyle: { value: 0 },
-    uLineJitter: { value: 0.05 },
-    uScanOpacity: { value: 0.85 },
-    uNoise: { value: 0.012 },
-    uBloomOpacity: { value: 0.5 },
-    uScanGlow: { value: 0.7 },
-    uScanSoftness: { value: 2.0 },
+    uLineJitter: { value: 0.04 },
+    uScanOpacity: { value: 1.0 },
+    uNoise: { value: 0.01 },
+    uBloomOpacity: { value: 0.6 },
+    uScanGlow: { value: 1.0 },
+    uScanSoftness: { value: 2.2 },
     uPhaseTaper: { value: 0.4 },
-    uScanDuration: { value: 2.2 },
-    uScanDelay: { value: 1.0 },
+    uScanDuration: { value: 2.0 },
+    uScanDelay: { value: 0.8 },
     uScanDirection: { value: 2 },
     uScanStarts: { value: new Array(MAX_SCANS).fill(0) },
     uScanCount: { value: 0 },
